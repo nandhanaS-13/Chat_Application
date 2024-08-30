@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="message-box">
+    <h2>Chat Room: {{code}}</h2><!--this is where we are going to inject our messages that we are going to get from our socket-->
+    <div class="messages" id="messages"></div>
+    <div class="inputs">
+        <input type="text" rows="3" placeholder="Message" name="Message" id="Message"/><!--rows =3 so we can have multi line text-->
+        <button type="button" name="send" id="sned-btn" onclick="sendMessage()">
+            Send
+        </button>
+    </div>
+
+</div>
+<script type="text/javascript">
+var socketio=io();
+
+//javascipt - socket connection
+const messages=document.getElementById("messages")
+
+const createMessage=(name,msg)=>{
+    const content=`
+    <div class="text">
+        <span>
+            <strong> ${name}</strong>:${msg}
+        </span>
+        <span class="muted">
+            ${new Date().toLocaleString()}
+        </span>
+    </div>
+    `
+
+    messages.innerHTML+=content;
+};
+socketio.on("message",(data)=>{
+    createMessage(data.name,data.message);
+});
+
+
+
+
+
+//sending message.....
+//we are going to send this to the server
+const sendMessage=() => {
+    const message=document.getElementById("message");
+  //  if(message.value == " ") return ;
+        
+    socketio.emit("message",{data:message.value});
+    message.value="";
+};
+</script>
+{% endblock %}
